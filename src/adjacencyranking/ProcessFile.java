@@ -113,21 +113,40 @@ public class ProcessFile {
             }
             Collections.sort(frequencies);
             for (int j = 0; j < Math.min(10, frequencies.size()); j++) {
-                rankingList.add(frequencies.get(i).getCategory());
+                rankingList.add(frequencies.get(j).getCategory());
             }       
+            
+            ranking.put(i, rankingList);
+        }
+        
+        return ranking;
+    }
+
+    Map<Integer, List<CategoryTitle>> addTitlesToRanking(Map<Integer, List<Integer>> ranking, Map<Integer, String> map) {
+        Map<Integer, List<CategoryTitle>> clustersWithTitles = new HashMap<>();
+        for (int i = 0; i < ranking.size(); i++) {
+            List<Integer> listToBeMapped = ranking.get(i);
+            List<CategoryTitle> categoryTitleList = new ArrayList<>();
+            for (Integer k : listToBeMapped) {
+                String title = map.get(k);
+                CategoryTitle ct = new CategoryTitle(k, title);
+                categoryTitleList.add(ct);
+            }
+            clustersWithTitles.put(i, categoryTitleList);
             try {
-                bufferedWriter.write(i + ":  " + rankingList.toString() + "\n");
+                bufferedWriter.write(i + ":  " + categoryTitleList.toString() + "\n");
                 bufferedWriter.flush();
             } catch (IOException ex) {
                 Logger.getLogger(ProcessFile.class.getName()).log(Level.SEVERE, null, ex);
             }
-            ranking.put(i, rankingList);
         }
         try {
             bufferedWriter.close();
         } catch (IOException ex) {
             Logger.getLogger(ProcessFile.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return ranking;
+        return clustersWithTitles;
     }
+
+    
 }
